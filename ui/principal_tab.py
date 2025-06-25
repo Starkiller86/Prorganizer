@@ -36,18 +36,45 @@ class PrincipalTab:
             self.show_weekly_gantt()
 
     def show_daily_view(self):
-        tree = ttk.Treeview(self.content_frame, columns=("Título", "Inicio", "Entrega", "Hora", "Responsable"), show="headings")
-        for col in tree["columns"]:
-            tree.heading(col, text=col)
+        label = ttk.Label(self.content_frame, text=f"Tareas del día: {datetime.today().strftime('%Y-%m-%d')}", font=("Segoe UI", 12, "bold"))
+        label.pack(pady=(10, 0))
+
+        columns = ("Título", "Inicio", "Entrega", "Hora", "Responsable")
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=25, bordercolor="#333", relief="solid")
+        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"), bordercolor="#333", relief="solid")
+        style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
+
+        tree = ttk.Treeview(self.content_frame, columns=columns, show="headings")
+
+        tree.heading("Título", text="Título")
+        tree.heading("Inicio", text="Fecha Inicio")
+        tree.heading("Entrega", text="Fecha Entrega")
+        tree.heading("Hora", text="Hora Entrega")
+        tree.heading("Responsable", text="Responsable")
+
+        tree.column("Título", anchor="w", width=250)
+        tree.column("Inicio", anchor="center", width=100)
+        tree.column("Entrega", anchor="center", width=100)
+        tree.column("Hora", anchor="center", width=80)
+        tree.column("Responsable", anchor="w", width=150)
+
+        tree.tag_configure("even", background="#f0f0f0")
+        tree.tag_configure("odd", background="#ffffff")
+
         tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         tasks = get_all_tasks()
-        for task in tasks:
+        for idx, task in enumerate(tasks):
+            tag = "even" if idx % 2 == 0 else "odd"
             tree.insert("", "end", values=(
-                task["titulo"], task["fecha_inicio"],
-                task["fecha_entrega"], task["hora_entrega"],
+                task["titulo"],
+                task["fecha_inicio"],
+                task["fecha_entrega"],
+                task["hora_entrega"],
                 task["responsable"]
-            ))
+            ), tags=(tag,))
 
     def show_weekly_gantt(self):
         tasks = get_all_tasks()
@@ -58,9 +85,9 @@ class PrincipalTab:
         ax.set_ylabel("Tareas")
 
         estado_color = {
-            "Por hacer": "#ffcc00",      # amarillo
-            "En revisión": "#00bfff",    # azul claro
-            "Finalizado": "#32cd32"      # verde
+            "Por hacer": "#ffcc00",
+            "En revisión": "#00bfff",
+            "Finalizado": "#32cd32"
         }
 
         y_labels = []
@@ -74,7 +101,7 @@ class PrincipalTab:
                 estado = task.get("estado", "")
                 color = estado_color.get(estado, "#999999")
 
-                ax.barh(i, duracion, left=inicio, height=0.5, color=color)
+                ax.barh(i, duracion, left=inicio, height=0.5, color=color, edgecolor='black')
                 y_labels.append(task["titulo"])
             except Exception as e:
                 print(f"Error en fechas: {e}")
