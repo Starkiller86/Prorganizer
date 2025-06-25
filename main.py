@@ -13,7 +13,7 @@ class GestorTareas:
         self.root.iconbitmap("assets/progranizer.ico")
 
         # Estilo bootstrap
-        self.style = tb.Style(theme="flatly")
+        self.style = tb.Style(theme="minty")
 
         # Crear el contenedor de pestañas
         self.tab_control = tb.Notebook(self.root)
