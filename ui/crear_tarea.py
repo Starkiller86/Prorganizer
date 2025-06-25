@@ -10,6 +10,7 @@ class CrearTareaWindow:
         self.window = tk.Toplevel(parent)
         self.window.title("Crear/Editar Tarea")
         self.window.geometry("500x500")
+        self.window.iconbitmap("assets/progranizer.ico")
 
         self.build_ui()
 

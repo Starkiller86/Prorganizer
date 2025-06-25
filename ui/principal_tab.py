@@ -57,23 +57,28 @@ class PrincipalTab:
         ax.set_xlabel("Fechas")
         ax.set_ylabel("Tareas")
 
-        y_labels = []
-        bar_data = []
+        estado_color = {
+            "Por hacer": "#ffcc00",      # amarillo
+            "En revisión": "#00bfff",    # azul claro
+            "Finalizado": "#32cd32"      # verde
+        }
 
-        for idx, task in enumerate(tasks):
+        y_labels = []
+        today = datetime.today().date()
+
+        for i, task in enumerate(tasks):
             try:
                 inicio = datetime.strptime(str(task["fecha_inicio"]), "%Y-%m-%d").date()
                 fin = datetime.strptime(str(task["fecha_entrega"]), "%Y-%m-%d").date()
+                duracion = (fin - inicio).days + 1
+                estado = task.get("estado", "")
+                color = estado_color.get(estado, "#999999")
+
+                ax.barh(i, duracion, left=inicio, height=0.5, color=color)
                 y_labels.append(task["titulo"])
-                bar_data.append((inicio, (fin - inicio).days + 1))
             except Exception as e:
                 print(f"Error en fechas: {e}")
 
-        for i, (start_date, duration) in enumerate(bar_data):
-            ax.barh(i, duration, left=start_date, height=0.5)
-
-        # 👉 Línea vertical para hoy
-        today = datetime.today().date()
         ax.axvline(today, color='red', linestyle='--', label='Hoy')
         ax.legend()
 
