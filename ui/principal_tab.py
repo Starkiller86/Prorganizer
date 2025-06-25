@@ -62,8 +62,8 @@ class PrincipalTab:
 
         for idx, task in enumerate(tasks):
             try:
-                inicio = datetime.strptime(str(task["fecha_inicio"]), "%Y-%m-%d")
-                fin = datetime.strptime(str(task["fecha_entrega"]), "%Y-%m-%d")
+                inicio = datetime.strptime(str(task["fecha_inicio"]), "%Y-%m-%d").date()
+                fin = datetime.strptime(str(task["fecha_entrega"]), "%Y-%m-%d").date()
                 y_labels.append(task["titulo"])
                 bar_data.append((inicio, (fin - inicio).days + 1))
             except Exception as e:
@@ -71,6 +71,11 @@ class PrincipalTab:
 
         for i, (start_date, duration) in enumerate(bar_data):
             ax.barh(i, duration, left=start_date, height=0.5)
+
+        # 👉 Línea vertical para hoy
+        today = datetime.today().date()
+        ax.axvline(today, color='red', linestyle='--', label='Hoy')
+        ax.legend()
 
         ax.set_yticks(range(len(y_labels)))
         ax.set_yticklabels(y_labels)
