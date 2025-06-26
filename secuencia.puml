@@ -1,0 +1,54 @@
+@startuml secuencia
+title Diagrama de Secuencia - Progranizer
+
+actor Usuario
+participant MainWindow
+participant PrincipalTab
+participant ListaTab
+participant CrearTareaWindow
+participant UsuariosTab
+participant "models.py" as Models
+participant "models_usuarios.py" as UserModels
+database "gestor_tareas (MySQL)" as DB
+
+== Crear Tarea ==
+
+Usuario -> ListaTab : clic en "Crear Tarea"
+ListaTab -> CrearTareaWindow : abrir ventana emergente
+Usuario -> CrearTareaWindow : llena campos y pulsa Guardar
+CrearTareaWindow -> Models : create_task(data)
+Models -> DB : INSERT INTO tareas ...
+DB --> Models : OK
+Models --> CrearTareaWindow : confirmación
+CrearTareaWindow -> ListaTab : on_save() → load_tasks
+ListaTab -> Models : get_all_tasks()
+Models -> DB : SELECT * FROM tareas
+DB --> Models : resultados
+Models --> ListaTab : lista de tareas
+ListaTab -> MainWindow : actualizar vista
+
+== Agregar Usuario ==
+
+Usuario -> UsuariosTab : clic en "Agregar Usuario"
+UsuariosTab -> UserModels : create_user(data)
+UserModels -> DB : INSERT INTO usuarios ...
+DB --> UserModels : OK
+UserModels --> UsuariosTab : confirmación
+UsuariosTab -> UserModels : get_all_users()
+UserModels -> DB : SELECT * FROM usuarios
+DB --> UserModels : lista usuarios
+UserModels --> UsuariosTab : datos → recargar UI
+
+== Marcar como Finalizado ==
+
+Usuario -> ListaTab : clic en menú → “Marcar como Finalizado”
+ListaTab -> Models : update_task(id, data)
+Models -> DB : UPDATE tareas SET estado='Finalizado'
+DB --> Models : OK
+Models --> ListaTab : confirmación
+ListaTab -> Models : get_all_tasks()
+Models -> DB : SELECT tareas
+DB --> Models : datos
+Models --> ListaTab : tareas actualizadas
+
+@enduml
