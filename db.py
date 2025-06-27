@@ -5,7 +5,7 @@ def connect_db():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="",
+        password="020614",
         database="gestor_tareas",
-        port="3309"
+        port="3306"
     )
