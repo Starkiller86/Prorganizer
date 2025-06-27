@@ -1,3 +1,12 @@
+"""
+principal_tab.py - Pestaña principal con vista diaria y diagrama de Gantt semanal.
+
+Esta vista permite al usuario alternar entre una visualización de tareas del día
+y un gráfico tipo Gantt de las tareas de la semana, usando matplotlib.
+
+Pertenece a la capa Vista en la arquitectura MVC.
+"""
+
 from tkinter import ttk
 import tkinter as tk
 from models import get_all_tasks
@@ -6,14 +15,30 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class PrincipalTab:
+    """
+    Clase que representa la pestaña 'Principal' de la aplicación.
+
+    Permite al usuario visualizar tareas en modo diario o semanal (Gantt).
+    Utiliza polimorfismo en `update_view` para cambiar el contenido mostrado.
+    """
+
     def __init__(self, notebook):
+        """
+        Inicializa la pestaña y construye su interfaz.
+
+        Args:
+            notebook (ttk.Notebook): Contenedor de pestañas.
+        """
         self.frame = ttk.Frame(notebook)
         notebook.add(self.frame, text="Principal")
 
-        self.view_mode = tk.StringVar(value="día")
+        self.view_mode = tk.StringVar(value="día")  # Alterna entre 'día' y 'semana'
         self.build_ui()
 
     def build_ui(self):
+        """
+        Construye los elementos de la interfaz gráfica, incluyendo botones de modo de vista.
+        """
         top_frame = ttk.Frame(self.frame)
         top_frame.pack(fill=tk.X, pady=10, padx=10)
 
@@ -27,6 +52,11 @@ class PrincipalTab:
         self.update_view()
 
     def update_view(self):
+        """
+        Cambia la vista entre 'día' y 'semana' dependiendo del valor de self.view_mode.
+
+        Aplica polimorfismo: la lógica cambia dinámicamente según el valor del estado.
+        """
         for widget in self.content_frame.winfo_children():
             widget.destroy()
 
@@ -36,6 +66,9 @@ class PrincipalTab:
             self.show_weekly_gantt()
 
     def show_daily_view(self):
+        """
+        Muestra una tabla con las tareas del día actual.
+        """
         label = ttk.Label(self.content_frame, text=f"Tareas del día: {datetime.today().strftime('%Y-%m-%d')}", font=("Segoe UI", 12, "bold"))
         label.pack(pady=(10, 0))
 
@@ -48,11 +81,8 @@ class PrincipalTab:
 
         tree = ttk.Treeview(self.content_frame, columns=columns, show="headings")
 
-        tree.heading("Título", text="Título")
-        tree.heading("Inicio", text="Fecha Inicio")
-        tree.heading("Entrega", text="Fecha Entrega")
-        tree.heading("Hora", text="Hora Entrega")
-        tree.heading("Responsable", text="Responsable")
+        for col in columns:
+            tree.heading(col, text=col)
 
         tree.column("Título", anchor="w", width=250)
         tree.column("Inicio", anchor="center", width=100)
@@ -77,6 +107,9 @@ class PrincipalTab:
             ), tags=(tag,))
 
     def show_weekly_gantt(self):
+        """
+        Muestra las tareas en un gráfico tipo Gantt usando matplotlib.
+        """
         tasks = get_all_tasks()
         fig = Figure(figsize=(10, 5))
         ax = fig.add_subplot(111)

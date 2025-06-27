@@ -1,10 +1,35 @@
+"""
+crear_tarea.py - Ventana emergente para crear o editar tareas.
+
+Este módulo define la clase CrearTareaWindow, que se utiliza para gestionar
+la interfaz de usuario y la lógica para crear o editar una tarea en el sistema.
+
+Forma parte de la capa Controlador en la arquitectura MVC.
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models import create_task, update_task
 from models_usuarios import get_all_users
 
 class CrearTareaWindow:
+    """
+    Ventana modal que permite al usuario crear o editar una tarea.
+
+    Aplica herencia implícita al usar `tk.Toplevel` como ventana secundaria.
+    Utiliza polimorfismo en `save_task`, donde el comportamiento depende de si se trata
+    de una tarea nueva o existente.
+    """
+
     def __init__(self, parent, on_save=None, task=None):
+        """
+        Constructor de la ventana.
+
+        Args:
+            parent (tk.Widget): Ventana padre.
+            on_save (function, optional): Función a ejecutar al guardar.
+            task (tuple, optional): Datos de la tarea si se está editando.
+        """
         self.task = task
         self.on_save = on_save
         self.window = tk.Toplevel(parent)
@@ -18,6 +43,9 @@ class CrearTareaWindow:
             self.fill_form()
 
     def build_ui(self):
+        """
+        Crea y organiza todos los widgets del formulario.
+        """
         frame = ttk.Frame(self.window)
         frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
@@ -61,6 +89,9 @@ class CrearTareaWindow:
         guardar_btn.grid(row=8, column=0, columnspan=2, pady=10)
 
     def fill_form(self):
+        """
+        Llena el formulario con los datos de una tarea existente (modo edición).
+        """
         self.titulo.insert(0, self.task[1])
         self.resumen.insert(0, self.task[2])
         self.estado.set(self.task[3])
@@ -76,6 +107,11 @@ class CrearTareaWindow:
                 break
 
     def save_task(self):
+        """
+        Guarda los datos de la tarea, sea nueva o modificada.
+
+        Muestra un mensaje en caso de éxito o error. Llama a `on_save` si se proporciona.
+        """
         try:
             responsable_nombre = self.responsable.get()
             usuario_id = self.usuarios_dict.get(responsable_nombre)

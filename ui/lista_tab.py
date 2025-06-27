@@ -1,3 +1,12 @@
+"""
+lista_tab.py - Pestaña de la interfaz para visualizar y gestionar tareas.
+
+Muestra una tabla con todas las tareas disponibles y permite crear, editar,
+eliminar o marcar tareas como finalizadas.
+
+Forma parte de la capa Vista del patrón MVC.
+"""
+
 from tkinter import ttk
 import tkinter as tk
 from ui.crear_tarea import CrearTareaWindow
@@ -5,12 +14,26 @@ from models import get_all_tasks, update_task, delete_task
 from tkinter import messagebox
 
 class ListaTab:
+    """
+    Clase que define la pestaña 'Lista' donde se muestran todas las tareas en un Treeview.
+    Permite acciones CRUD sobre las tareas.
+    """
+
     def __init__(self, notebook):
+        """
+        Inicializa la pestaña dentro del widget de pestañas (Notebook).
+
+        Args:
+            notebook (ttk.Notebook): Contenedor de pestañas.
+        """
         self.frame = ttk.Frame(notebook)
         notebook.add(self.frame, text="Lista")
         self.build_ui()
 
     def build_ui(self):
+        """
+        Construye la interfaz con un botón de creación y una tabla con las tareas.
+        """
         top_frame = ttk.Frame(self.frame)
         top_frame.pack(fill=tk.X, padx=10, pady=10)
 
@@ -23,7 +46,7 @@ class ListaTab:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center")
 
-        # Ocultar columnas que no quieres mostrar visualmente
+        # Ocultar columnas menos relevantes visualmente
         self.tree.column("Resumen", width=0, stretch=False)
         self.tree.column("Detalles", width=0, stretch=False)
         self.tree.column("Usuario ID", width=0, stretch=False)
@@ -39,12 +62,18 @@ class ListaTab:
         self.load_tasks()
 
     def show_menu(self, event):
+        """
+        Muestra el menú contextual al hacer clic derecho sobre una fila.
+        """
         selected = self.tree.identify_row(event.y)
         if selected:
             self.tree.selection_set(selected)
             self.menu.post(event.x_root, event.y_root)
 
     def load_tasks(self):
+        """
+        Carga las tareas desde la base de datos y las muestra en la tabla.
+        """
         for row in self.tree.get_children():
             self.tree.delete(row)
         for task in get_all_tasks():
@@ -62,9 +91,15 @@ class ListaTab:
             ))
 
     def open_create_window(self):
+        """
+        Abre la ventana para crear una nueva tarea.
+        """
         CrearTareaWindow(self.frame, on_save=self.load_tasks)
 
     def edit_task(self):
+        """
+        Abre la ventana para editar la tarea seleccionada.
+        """
         selected = self.tree.selection()
         if not selected:
             return
@@ -72,6 +107,9 @@ class ListaTab:
         CrearTareaWindow(self.frame, on_save=self.load_tasks, task=task_data)
 
     def delete_selected_task(self):
+        """
+        Elimina la tarea seleccionada después de confirmación del usuario.
+        """
         selected = self.tree.selection()
         if not selected:
             return
@@ -82,6 +120,9 @@ class ListaTab:
             self.load_tasks()
 
     def mark_as_done(self):
+        """
+        Cambia el estado de la tarea seleccionada a 'Finalizado'.
+        """
         selected = self.tree.selection()
         if not selected:
             return
