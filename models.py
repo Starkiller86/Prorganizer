@@ -15,45 +15,19 @@ def create_task(data):
     Args:
         data (tuple): Contiene los siguientes datos en orden:
             (titulo, resumen, estado, fecha_inicio, fecha_entrega,
-            hora_entrega, detalles, usuario_id)
+            hora_entrega, detalles, color)
     """
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO tareas 
-        (titulo, resumen, estado, fecha_inicio, fecha_entrega, hora_entrega, detalles, usuario_id)
+        (titulo, resumen, estado, fecha_inicio, fecha_entrega, hora_entrega, detalles, color)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """, data)
     conn.commit()
+    cursor.close()
     conn.close()
 
-def get_all_tasks():
-    """
-    Recupera todas las tareas de la base de datos, incluyendo información del usuario responsable.
-
-    Returns:
-        list[dict]: Lista de tareas con información extendida.
-    """
-    conn = connect_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT 
-            tareas.id,
-            tareas.titulo,
-            tareas.resumen,
-            tareas.estado,
-            tareas.fecha_inicio,
-            tareas.fecha_entrega,
-            tareas.hora_entrega,
-            tareas.detalles,
-            tareas.usuario_id,
-            usuarios.nombre AS responsable
-        FROM tareas
-        LEFT JOIN usuarios ON tareas.usuario_id = usuarios.id
-    """)
-    tasks = cursor.fetchall()
-    conn.close()
-    return tasks
 
 def update_task(task_id, data):
     """
@@ -79,11 +53,13 @@ def update_task(task_id, data):
             fecha_entrega=%s,
             hora_entrega=%s,
             detalles=%s,
-            usuario_id=%s
+            color=%s
         WHERE id=%s
     """, (*data, task_id))
     conn.commit()
+    cursor.close()
     conn.close()
+
 
 def delete_task(task_id):
     """
@@ -98,3 +74,32 @@ def delete_task(task_id):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def get_all_tasks():
+    """
+    Recupera todas las tareas de la base de datos, ordenadas por fecha de entrega.
+
+    Returns:
+        list[dict]: Lista de tareas.
+    """
+    conn = connect_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            id,
+            titulo,
+            resumen,
+            estado,
+            fecha_inicio,
+            fecha_entrega,
+            hora_entrega,
+            detalles,
+            color
+        FROM tareas
+        ORDER BY fecha_entrega ASC
+    """)
+    tareas = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return tareas
