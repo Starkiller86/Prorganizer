@@ -97,7 +97,7 @@ def get_all_tasks():
             detalles,
             color
         FROM tareas
-        ORDER BY fecha_entrega ASC
+        ORDER BY fecha_entrega ASC, hora_entrega ASC
     """)
     tareas = cursor.fetchall()
     cursor.close()
