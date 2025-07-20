@@ -1,5 +1,8 @@
 import mysql.connector
 import traceback
+import mysql.connector
+print(mysql.connector.__file__)
+
 
 def connect_db():
     try:
